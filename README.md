@@ -1,6 +1,13 @@
 # gopository
 Simple artifact repository written in Go.
 
+## Build
+```
+go get github.com/trubeck/gopository
+
+go install github.com/trubeck/gopository
+```
+
 ## Setup
 
 1. Create folder where all artifacts should be stored. This is the `base-path`
