@@ -76,7 +76,7 @@ func main() {
 		log.Info("You are serving gopository with HTTP.")
 		log.Fatal(http.ListenAndServe(host+":"+port, router))
 	} else {
-		log.Info("You are serving gopository with HTTP.")
+		log.Info("You are serving gopository with HTTPS.")
 		log.Fatal(http.ListenAndServeTLS(host+":"+port, sslCertPath, sslKeyPath, router))
 	}
 }
