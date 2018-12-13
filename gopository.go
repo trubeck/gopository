@@ -11,6 +11,9 @@ var basePath string
 var host string
 var port string
 
+var sslCertPath string
+var sslKeyPath string
+
 var storage map[string][][][]string
 
 var log = simpleLogger.Create(false, "")
@@ -36,6 +39,16 @@ func main() {
 			i++
 			port = argsWithoutProg[i]
 		}
+
+		if argsWithoutProg[i] == "--sslCert" {
+			i++
+			sslCertPath = argsWithoutProg[i]
+		}
+
+		if argsWithoutProg[i] == "--sslKey" {
+			i++
+			sslKeyPath = argsWithoutProg[i]
+		}
 	}
 
 	if host == "" {
@@ -59,6 +72,11 @@ func main() {
 
 	log.Info("Ready to accept connections")
 
-	log.Fatal(http.ListenAndServe(host+":"+port, router))
-
+	if sslCertPath == "" || sslKeyPath == "" {
+		log.Info("You are serving gopository with HTTP.")
+		log.Fatal(http.ListenAndServe(host+":"+port, router))
+	} else {
+		log.Info("You are serving gopository with HTTPS.")
+		log.Fatal(http.ListenAndServeTLS(host+":"+port, sslCertPath, sslKeyPath, router))
+	}
 }
