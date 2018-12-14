@@ -1,0 +1,4 @@
+FROM scratch
+COPY gopository /
+EXPOSE 8080
+ENTRYPOINT ["./gopository", "--path", "/repo", "--host", "0.0.0.0", "--port", "8080"]
