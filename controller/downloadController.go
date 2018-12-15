@@ -1,16 +1,20 @@
 package controller
 
 import (
-	"github.com/julienschmidt/httprouter"
-	"github.com/trubeck/gopository/services"
-	"github.com/trubeck/gopository/storage"
-	log "github.com/trubeck/simpleLogger"
 	"io"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/julienschmidt/httprouter"
+	log "github.com/trubeck/simpleLogger"
+
+	"github.com/trubeck/gopository/services"
+	"github.com/trubeck/gopository/storage"
 )
+
+const VersionNotFound = "Version not Found"
 
 // Download is the controller for downloading artifacts
 func Download(w http.ResponseWriter, _ *http.Request, ps httprouter.Params) {
@@ -39,42 +43,28 @@ func Download(w http.ResponseWriter, _ *http.Request, ps httprouter.Params) {
 
 	} else {
 
-		split := strings.Split(ps.ByName("version"), "-")
-
 		err := error(nil)
 
-		major, err = strconv.Atoi(split[0])
+		major, minor, patch, err = services.ParseVersion(ps.ByName("version"), "-")
 		if err != nil {
-			http.Error(w, "Version not found", 404)
-			return
-		}
-
-		minor, err = strconv.Atoi(split[1])
-		if err != nil {
-			http.Error(w, "Version not found", 404)
-			return
-		}
-
-		patch, err = strconv.Atoi(split[2])
-		if err != nil {
-			http.Error(w, "Version not found", 404)
+			http.Error(w, VersionNotFound, 404)
 			return
 		}
 
 	}
 
 	if major > len(versions)-1 {
-		http.Error(w, "Version not found", 404)
+		http.Error(w, VersionNotFound, 404)
 		return
 	}
 
 	if minor > len(versions[major])-1 {
-		http.Error(w, "Version not found", 404)
+		http.Error(w, VersionNotFound, 404)
 		return
 	}
 
 	if patch > len(versions[major][minor])-1 {
-		http.Error(w, "Version not found", 404)
+		http.Error(w, VersionNotFound, 404)
 		return
 	}
 

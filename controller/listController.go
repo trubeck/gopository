@@ -2,11 +2,12 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/julienschmidt/httprouter"
-	"github.com/trubeck/gopository/services"
-	log "github.com/trubeck/simpleLogger"
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
+	log "github.com/trubeck/simpleLogger"
+
+	"github.com/trubeck/gopository/services"
 )
 
 func ListPackages(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
@@ -22,8 +23,6 @@ func ListPackages(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 	if err != nil {
 		log.Error(err)
 	}
-
-	fmt.Println(body)
 
 	w.Write(body)
 	return

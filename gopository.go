@@ -1,12 +1,14 @@
 package main
 
 import (
-	"github.com/julienschmidt/httprouter"
-	"github.com/trubeck/gopository/controller"
-	"github.com/trubeck/gopository/storage"
-	log "github.com/trubeck/simpleLogger"
 	"net/http"
 	"os"
+
+	"github.com/julienschmidt/httprouter"
+	log "github.com/trubeck/simpleLogger"
+
+	"github.com/trubeck/gopository/controller"
+	"github.com/trubeck/gopository/storage"
 )
 
 var basePath string
@@ -19,10 +21,34 @@ var sslKeyPath string
 func main() {
 
 	// Parse args
+	parseArgsAndEnv()
 
 	log.CreateLogger(true, "")
 	log.Initilize()
 
+	storage.Initialize()
+
+	// Scan for artifacts
+	scanFolders()
+
+	// Start webserver
+	router := httprouter.New()
+	router.GET("/download/:pkg/:version", controller.Download)
+	router.GET("/packages", controller.ListPackages)
+	router.GET("/versions", controller.ListVersions)
+
+	log.Info("Ready to accept connections")
+
+	if sslCertPath == "" || sslKeyPath == "" {
+		log.Info("You are serving gopository with HTTP.")
+		log.Fatal(http.ListenAndServe(host+":"+port, router))
+	} else {
+		log.Info("You are serving gopository with HTTPS.")
+		log.Fatal(http.ListenAndServeTLS(host+":"+port, sslCertPath, sslKeyPath, router))
+	}
+}
+
+func parseArgsAndEnv() {
 	// Get ENVs
 
 	sslCertPath = os.Getenv("SSL_CERT")
@@ -65,26 +91,5 @@ func main() {
 
 	if port == "" {
 		port = "8080"
-	}
-
-	storage.Initialize()
-
-	// Scan for artifacts
-	scanFolders()
-
-	// Start webserver
-	router := httprouter.New()
-	router.GET("/download/:pkg/:version", controller.Download)
-	router.GET("/packages", controller.ListPackages)
-	router.GET("/versions", controller.ListVersions)
-
-	log.Info("Ready to accept connections")
-
-	if sslCertPath == "" || sslKeyPath == "" {
-		log.Info("You are serving gopository with HTTP.")
-		log.Fatal(http.ListenAndServe(host+":"+port, router))
-	} else {
-		log.Info("You are serving gopository with HTTPS.")
-		log.Fatal(http.ListenAndServeTLS(host+":"+port, sslCertPath, sslKeyPath, router))
 	}
 }

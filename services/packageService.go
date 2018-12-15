@@ -2,10 +2,8 @@ package services
 
 import (
 	"fmt"
+
 	"github.com/trubeck/gopository/storage"
-	log "github.com/trubeck/simpleLogger"
-	"strconv"
-	"strings"
 )
 
 func GetAllPackageNames() (result []string) {
@@ -45,25 +43,5 @@ func GetLatestVersion(packageName string) (major int, minor int, patch int, err 
 
 	latestVersion := packageVersions[len(packageVersions)-1]
 
-	split := strings.Split(latestVersion, ".")
-
-	major, err = strconv.Atoi(split[0])
-	if err != nil {
-		log.Error(err)
-		return 0, 0, 0, err
-	}
-
-	minor, err = strconv.Atoi(split[1])
-	if err != nil {
-		log.Error(err)
-		return 0, 0, 0, err
-	}
-
-	patch, err = strconv.Atoi(split[2])
-	if err != nil {
-		log.Error(err)
-		return 0, 0, 0, err
-	}
-
-	return
+	return ParseVersion(latestVersion, ".")
 }
