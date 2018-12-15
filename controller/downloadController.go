@@ -1,10 +1,10 @@
-package main
+package controller
 
 import (
-	"encoding/json"
-	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"github.com/trubeck/gopository/services"
+	"github.com/trubeck/gopository/storage"
+	log "github.com/trubeck/simpleLogger"
 	"io"
 	"net/http"
 	"os"
@@ -21,7 +21,7 @@ func Download(w http.ResponseWriter, _ *http.Request, ps httprouter.Params) {
 	var minor int
 	var patch int
 
-	versions := storage[ps.ByName("pkg")]
+	versions := storage.Storage[ps.ByName("pkg")]
 	if len(versions) == 0 {
 		http.Error(w, "Package Not Found", 404)
 		return
@@ -31,7 +31,7 @@ func Download(w http.ResponseWriter, _ *http.Request, ps httprouter.Params) {
 
 		err := error(nil)
 
-		major, minor, patch, err = services.GetLatestVersion(storage, ps.ByName("pkg"))
+		major, minor, patch, err = services.GetLatestVersion(ps.ByName("pkg"))
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
@@ -126,41 +126,4 @@ func Download(w http.ResponseWriter, _ *http.Request, ps httprouter.Params) {
 		http.Error(w, "Internal Server Error", 500)
 		return
 	}
-}
-
-func ListPackages(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
-	type Response struct {
-		Packages []string
-	}
-
-	var resp Response
-
-	resp.Packages = services.GetAllPackageNames(storage)
-
-	body, err := json.Marshal(resp)
-	if err != nil {
-		log.Error(err)
-	}
-
-	fmt.Println(body)
-
-	w.Write(body)
-	return
-}
-
-func ListVersions(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
-	type Response struct {
-		Packages []struct {
-			PackageName map[string][]string
-		}
-	}
-
-	body, err := json.Marshal(services.GetAllVersions(storage))
-	if err != nil {
-		log.Error(err)
-	}
-
-	w.Write(body)
-	return
-
 }

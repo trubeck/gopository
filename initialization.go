@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/trubeck/gopository/storage"
+	log "github.com/trubeck/simpleLogger"
 	"io/ioutil"
 	"strconv"
 	"strings"
@@ -50,7 +52,7 @@ func getFiles(pkgName string) {
 				fmt.Println(err)
 			}
 
-			version := storage[pkgName]
+			version := storage.Storage[pkgName]
 
 			if major > len(version)-1 {
 				for i := len(version) - 1; i < major+1; i++ {
@@ -77,7 +79,7 @@ func getFiles(pkgName string) {
 			log.Trace(patch)
 
 			version[major][minor][patch] = basePath + "/" + pkgName + "/" + f.Name()
-			storage[pkgName] = version
+			storage.Storage[pkgName] = version
 
 		}
 

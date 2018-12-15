@@ -2,7 +2,9 @@ package main
 
 import (
 	"github.com/julienschmidt/httprouter"
-	"github.com/trubeck/simpleLogger"
+	"github.com/trubeck/gopository/controller"
+	"github.com/trubeck/gopository/storage"
+	log "github.com/trubeck/simpleLogger"
 	"net/http"
 	"os"
 )
@@ -14,14 +16,19 @@ var port string
 var sslCertPath string
 var sslKeyPath string
 
-var storage map[string][][][]string
-
-var log = simpleLogger.Create(false, "")
-
 func main() {
 
 	// Parse args
 
+	log.CreateLogger(true, "")
+	log.Initilize()
+
+	// Get ENVs
+
+	sslCertPath = os.Getenv("SSL_CERT")
+	sslKeyPath = os.Getenv("SSL_KEY")
+
+	// Parse args
 	argsWithoutProg := os.Args[1:]
 
 	for i := 0; i < len(argsWithoutProg); i++ {
@@ -40,6 +47,7 @@ func main() {
 			port = argsWithoutProg[i]
 		}
 
+		//Program arguments overwrite env values for the SSL config
 		if argsWithoutProg[i] == "--sslCert" {
 			i++
 			sslCertPath = argsWithoutProg[i]
@@ -59,16 +67,16 @@ func main() {
 		port = "8080"
 	}
 
-	storage = make(map[string][][][]string)
+	storage.Initialize()
 
 	// Scan for artifacts
 	scanFolders()
 
 	// Start webserver
 	router := httprouter.New()
-	router.GET("/download/:pkg/:version", Download)
-	router.GET("/packages", ListPackages)
-	router.GET("/versions", ListVersions)
+	router.GET("/download/:pkg/:version", controller.Download)
+	router.GET("/packages", controller.ListPackages)
+	router.GET("/versions", controller.ListVersions)
 
 	log.Info("Ready to accept connections")
 

@@ -2,30 +2,29 @@ package services
 
 import (
 	"fmt"
-	"github.com/trubeck/simpleLogger"
+	"github.com/trubeck/gopository/storage"
+	log "github.com/trubeck/simpleLogger"
 	"strconv"
 	"strings"
 )
 
-var log = simpleLogger.Create(true, "")
+func GetAllPackageNames() (result []string) {
+	result = make([]string, 0, len(storage.Storage))
 
-func GetAllPackageNames(storage map[string][][][]string) (result []string) {
-	result = make([]string, 0, len(storage))
-
-	for k := range storage {
+	for k := range storage.Storage {
 		result = append(result, k)
 	}
 
 	return
 }
 
-func GetAllVersions(storage map[string][][][]string) (result map[string][]string) {
-	packageNames := GetAllPackageNames(storage)
+func GetAllVersions() (result map[string][]string) {
+	packageNames := GetAllPackageNames()
 
 	result = make(map[string][]string)
 
 	for _, pkg := range packageNames {
-		for i, major := range storage[pkg] {
+		for i, major := range storage.Storage[pkg] {
 			for j, minor := range major {
 				for k, patch := range minor {
 					if patch != "" {
@@ -39,8 +38,8 @@ func GetAllVersions(storage map[string][][][]string) (result map[string][]string
 	return
 }
 
-func GetLatestVersion(storage map[string][][][]string, packageName string) (major int, minor int, patch int, err error) {
-	packages := GetAllVersions(storage)
+func GetLatestVersion(packageName string) (major int, minor int, patch int, err error) {
+	packages := GetAllVersions()
 
 	packageVersions := packages[packageName]
 
