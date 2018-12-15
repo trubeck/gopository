@@ -49,6 +49,11 @@ will be the names of the packages* (`package-name`)
     
 6. If you added new artifact, restart the gorepository.
 
+### SSL
+
+If you want the connection to be SSL encrypted use the arguments `--sslCert` and
+`--sslKey` with the paths to the right files.
+
 ## Usage
 
 Get a List of all package names:
