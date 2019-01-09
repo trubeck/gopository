@@ -45,7 +45,7 @@ will be the names of the packages* (`package-name`)
     ```
     gopository --path "<base-path>" --host "<host>" --port "<port>"
     ```
-    *The Host defaults to `localhost` and the post to `8080`*
+    *The host defaults to `localhost` and the port to `8080`*
     
 6. If you added new artifact, restart the gorepository.
 
